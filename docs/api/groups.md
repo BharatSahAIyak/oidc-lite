@@ -7,15 +7,35 @@
 
 ![Groups Sequence Diagram](../assets/sequence-diagrams/groups.png)
 
-## Endpoints
+## Create Group 
+### Request 
+#### Create Group with random Id 
+`POST /group`
 
-### 1. Create Group with random Id 
-- **Endpoint** : Post `/group`
-- **Description**: This API is used to create a new Group.
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `uuid`: The unique id for the new group
-  - `data`: Object containing group details (name, tenantId, roleIDs)
+#### Create Group with given Id 
+`POST /group/:id`
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request Body 
+- data : `{"roleIDs" : string[], "name" : string}`
+
+#### Request Parameter
+- id : `string`
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample cURL**:
   ```sh
   curl -X POST http://localhost:3000/group \
@@ -35,37 +55,32 @@
   tenantId="<tenant_id>" \
   roleIDs:='["<role_id1>", "<role_id2>"]'
 
-### 2. Create Group with given Id 
-- **Endpoint** : Post `/group/:id`
-- **Description**: This API is used to create a new Group.
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `uuid`: The unique id for the new group
-  - `data`: Object containing group details (name, tenantId, roleIDs)
-- **Sample cURL**:
-  ```sh
-  curl -X POST http://localhost:3000/group/<id> \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Basic <your_authorization_key>" \
-  -d '{
-    "name": "<group_name>",
-    "tenantId": "<tenant_id>",
-    "roleIDs": ["<role_id1>", "<role_id2>"]
-  }'
+## Retrieve All Groups
+### Request 
+#### Retrieve all of the configured Groups.
+`GET /group`
 
-- **Sample HTTPie**:
-  ```sh
-  http POST http://localhost:3000/group/<id> \
-  Authorization:"Basic <your_authorization_key>"
-  name="<group_name>" \
-  tenantId="<tenant_id>" \
-  roleIDs:='["<role_id1>", "<role_id2>"]'
+#### Retrieve Group by ID
+`GET /group/:id`
 
+#### Request Headers 
+- authorization : `string`
 
-### 3. Retrieve All Groups
-- **Endpoint** : Get `/group`
-- **Description**: This API is used to retrieve all of the configured Groups.
-- **Authorization-Header**: Required
+#### Request Parameter
+- id : `string` *required when retreival needed for a particular group*
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample cURL**:
   ```sh
   curl -X GET http://localhost:3000/group \
@@ -78,31 +93,33 @@
   Authorization:"Bearer <your_access_token>"
 
 
-### 4. Retrieve Group by ID
-- **Endpoint** : Get `/group/:id`
-- **Description**: This API is used to retrieve a single Group by unique Id among the configured Groups.
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `id`: The unique id of the group
-- **Sample cURL**:
-  ```sh
-  curl -X GET http://localhost:3000/group/<id> \
-  -H "Authorization: Bearer <your_access_token>"
+## Update Group
+### Request 
+#### Update an existing Group
+`PUT /group/:id`
+  
+#### Request Headers 
+- authorization : `string`
 
+#### Request Body 
+- name : `string`,
+- roleIDs : `string[]`
 
-- **Sample HTTPie**:
-  ```sh
-  http GET http://localhost:3000/group/<id> \
-  Authorization:"Bearer <your_access_token>"
+#### Request Parameter
+- id : `string` 
+- 
+### Response
 
+#### Response Codes
 
-### 5. Update Group
-- **Endpoint** : Put `/group/:id`
-- **Description**: This API is used to update an existing Group.
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `uuid`: The unique id of the group
-  - `data`: Object containing update information (name, roleIDs)
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample cURL**:
   ```sh
   curl -X PUT http://localhost:3000/group/<id> \
@@ -121,12 +138,28 @@
   roleIDs:='["<updated_role_id1>", "<updated_role_id2>"]'
 
 
-### 6. Delete Group
-- **Endpoint** : Delete `/group/:id`
-- **Description**: This API is used to permanently delete a Group
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `uuid`: The unique id of the group
+## Delete Group
+### Request 
+#### Delete a Group permanently
+`DELETE /group/:id`
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request Parameter
+- id : `string` 
+- 
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
 - **Sample cURL**:
   ```sh
   curl -X DELETE http://localhost:3000/group/<id> \
@@ -160,12 +193,29 @@ This service manages the relationship between users and groups within a multi-ap
 ## Endpoints
 > If the authorization key provided in Authorization header is tenant scoped, then an additional header `X-Stencil-Tenantid` is required to specify the tenant to be used. `-H "X-Stencil-Tenantid: <your_tenant_id>"` or `X-Stencil-Tenantid: <your_tenant_id>`
 
-### 1. Add User to Group
-- **Endpoint** : Post `/group/member`
-- **Description**: This API is used to add Users to a Group. A User that is added to a Group is called a member, a user can belong to one to many Groups.
-- **Authorization-Header**: Required
-- **Body**: 
-  - `members`: Array of objects containing `groupId` and `userIds`
+## Add User to Group
+### Request 
+#### Add Users to a Group.
+`POST /group/member`
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request Body 
+- members : `{groupIDs : string[], userIDs : string[]}`
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample cURL**:
   ```sh
   curl -X POST http://localhost:3000/group/member \
@@ -191,10 +241,29 @@ This service manages the relationship between users and groups within a multi-ap
   ]'
 
 
-### 2. Update User in Group
-- **Endpoint** : Put `/group/member`
-- **Description**: Updates user memberships in groups (Note: Implementation details are not fully provided in the given code).
-- **Authorization-Header**: Required
+## Update User in Group
+### Request 
+#### Updates user memberships in groups
+`PUT /group/member`
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request Body 
+- members : `{groupIDs : string[], userIDs : string[]}`
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample cURL**:
   ```sh
   curl -X PUT http://localhost:3000/group/member \
@@ -222,12 +291,43 @@ This service manages the relationship between users and groups within a multi-ap
   ]'
 
 
-### 3. Delete Member by ID
-- **Endpoint** : Delete `/group/member/:id`
-- **Description**: Removes a specific member from a group using the membership ID.
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `uuid`: The unique identifier of the group membership
+## Delete Member 
+### Request 
+####  Delete Member by ID
+`DELETE /group/member/:id`
+
+#### Delete Member by User ID and Group ID
+`DELETE /group/member`
+
+#### Delete All Users from Group
+`DELETE /group/member`
+
+#### Delete Multiple Members
+`DELETE /group/member`
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request Parameter 
+- id : `string` *required when group is to be deleted through ID*
+- `userId`: The ID of the user && `gpId`: The ID of the group *required when group is to be deleted through userID and GroupID*
+- `gpId`: The ID of the group *required when group is to be deleted thorugh group ID*
+
+#### Request Body 
+- members : `{membership : string[]}` *required when multiple members of a gp to be deleted*
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample cURL**:
   ```sh
   curl -X DELETE http://localhost:3000/group/member/<id> \
@@ -241,85 +341,6 @@ This service manages the relationship between users and groups within a multi-ap
   http DELETE http://localhost:3000/group/member/<id> \
   Authorization:"Bearer <your-token>" \
   x-stencil-tenanid:<your-tenant-id>
-
-
-
-### 4. Delete Member by User ID and Group ID
-- **Endpoint** : Delete `/group/member`
-- **Description**: Removes a user from a specific group using user ID and group ID.
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `userId`: The ID of the user
-  - `gpId`: The ID of the group
-- **Sample cURL**:
-  ```sh
-  curl -X DELETE http://localhost:3000/group/member \
-    -H "Authorization: Bearer <your-token>" \
-    -H "x-stencil-tenanid: <your-tenant-id>" \
-    -H "Content-Type: application/json" \
-    -d '{
-      "userId": "user-id-1",
-      "gpId": "group-id-1"
-    }'
-
-
-- **Sample HTTPie**:
-  ```sh
-  http DELETE http://localhost:3000/group/member \
-    Authorization:"Bearer <your-token>" \
-    x-stencil-tenanid:<your-tenant-id> \
-    userId=user-id-1 \
-    gpId=group-id-1
-
-
-### 5. Delete All Users from Group
-- **Endpoint** : Delete `/group/member`
-- **Description**: Removes all users from a specified group.
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `gpId`: The ID of the group
-- **Sample cURL**:
-  ```sh
-  curl -X DELETE http://localhost:3000/group/member \
-    -H "Authorization: Bearer <your-token>" \
-    -H "x-stencil-tenanid: <your-tenant-id>" \
-    -H "Content-Type: application/json" \
-    -d '{
-      "gpId": "group-id-1"
-    }'
-
-
-- **Sample HTTPie**:
-  ```sh
-    http DELETE http://localhost:3000/group/member \
-      Authorization:"Bearer <your-token>" \
-      x-stencil-tenanid:<your-tenant-id> \
-      gpId=group-id-1
-
-### 6. Delete Multiple Members
-- **Endpoint** : Delete `/group/member`
-- **Description**: Removes multiple members from their respective groups.
-- **Authorization-Header**: Required
-- **Body**: 
-  - `members`: Array of membership IDs to be deleted
-- **Sample cURL**:
-  ```sh
-  curl -X DELETE http://localhost:3000/group/member \
-    -H "Authorization: Bearer <your-token>" \
-    -H "x-stencil-tenanid: <your-tenant-id>" \
-    -H "Content-Type: application/json" \
-    -d '{
-      "members": ["membership-id-1", "membership-id-2"]
-    }'
-
-
-- **Sample HTTPie**:
-  ```sh
-  http DELETE http://localhost:3000/group/member \
-    Authorization:"Bearer <your-token>" \
-    x-stencil-tenanid:<your-tenant-id> \
-    members:='["membership-id-1", "membership-id-2"]'
-
 
 ## Authorization
 All endpoints are protected by authorization headers which requires authorization and x-stencil-tenanid values to be passed in headers, which are verified using the `HeaderAuthService`.

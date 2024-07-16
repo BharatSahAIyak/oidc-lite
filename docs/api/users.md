@@ -9,15 +9,32 @@ The User Service is a part of a NestJS application that handles user-related ope
 
 ![Users Sequence Diagram](../assets/sequence-diagrams/users.png)
 
-## Endpoints
+## Create A User
+### Request 
+#### Create A User with random id
+`POST /user`
 
-### 1. Create A User with random id
-- **Endpoint** : Post `/user`
-- **Description** : Creates a new user in the system.
-- **Authorization-Header**: Required
-- **Parameters:**
-    - `data`: CreateUserDto - The data for creating the user
-    - `headers`: object - The request headers
+#### Create A User with given id
+`POST /user/:id`
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request body
+- data: `{"active" : boolean, "additionalData" ?: "string", "membership" : string[], "userData" : UserDataDto, "email" : "string"}`
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample cURL**:
   ```sh
   curl -X POST http://localhost:3000/user \
@@ -36,42 +53,34 @@ The User Service is a part of a NestJS application that handles user-related ope
     "email": "<user_email>"
   }'
 
-
-### 2. Create A User with given id
-- **Endpoint** : Post `/user/:id`
-- **Description** : Creates a new user in the system.
-- **Authorization-Header**: Required
-- **Parameters:**
-    - `id`: string - The unique identifier for the user
-    - `data`: CreateUserDto - The data for creating the user
-    - `headers`: object - The request headers
-- **Sample cURL**:
-  ```sh
-  curl -X POST http://localhost:3000/user/<id> \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Basic <your_authorization_key>" \
-  -d '{
-    "name": "<user_name>",
-    "email": "<user_email>"
-  }'
-
-- **Sample HTTPie**:
-  ```sh
-  http POST http://localhost:3000/user/<id> \
-  Authorization:"Basic <your_authorization_key>"
-  data:='{
-    "name": "<user_name>",
-    "email": "<user_email>"
-  }'
-
-
-### 3. Return a User
-- **Endpoint** : Get `/user/:id`
-- **Description** : Retrieves a user by their ID.
+## Return a User
+### Reqeust 
+#### Retrieves a user by their ID.
+`GET /user/:id`
+- **Description** : 
 - **Authorization-Header**: Required
 - **Parameters:**
     - `id`: string - The unique identifier of the user
     - `headers`: object - The request headers
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request Parameter
+- id: `string`
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample cURL**:
   ```sh
   curl -X GET http://localhost:3000/user/<id> \
@@ -83,14 +92,32 @@ The User Service is a part of a NestJS application that handles user-related ope
   Authorization:"Bearer <your_access_token>"
 
 
-### 4. Update a User
-- **Endpoint** : Post `/user/:id`
-- **Description** : Updates an existing user's information.
-- **Authorization-Header**: Required
-- **Parameters:**
-    - `id`: string - The unique identifier of the user
-    - `data`: UpdateUserDto - The data to update the user
-    - `headers`: object - The request headers
+## Update a User
+### Request 
+####  Updates an existing user's information
+`POST /user/:id`
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request body
+- data: `{"active" : boolean, "additionalData" ?: "string", "membership" : string[], "userData" : UserDataDto}`
+
+#### Request Parameter
+- id: `string`
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample cURL**:
   ```sh
   curl -X POST http://localhost:3000/user/<id> \
@@ -111,14 +138,32 @@ The User Service is a part of a NestJS application that handles user-related ope
   }'
 
 
-### 5. Delete a User
-- **Endpoint** : Post `/user/:id`
-- **Description** : Deletes a user or sets them as inactive.
-- **Authorization-Header**: Required
-- **Parameters:**
-    - `id`: string - The unique identifier of the user
-    - `headers`: object - The request headers
-    - `hardDelete`: string - If provided, permanently deletes the user; otherwise, sets the user as inactive
+## Delete a User
+### Request 
+#### Deletes a user or sets them as inactive.
+`POST /user/:id`
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request body
+- hardDelete: `boolean`
+
+#### Request Parameter
+- id: `string`
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample cURL**:
   ```sh
   curl -X POST http://localhost:3000/user/<id> \
@@ -141,16 +186,32 @@ The User Service is a part of a NestJS application that handles user-related ope
 The User Registration Service is part of a NestJS application that handles user registration operations, including creating, retrieving, updating, and deleting user registrations. It also provides functionality to create both a user and their registration in a single operation.
 
 
-## Endpoints
+## Create A User Registration
+### Request 
+#### Creates a new user registration.
+`POST /registration/:userId`
 
-### 1. Create A User Registration
-- **Endpoint** : Post `/registration/:userId`
-- **Description** : Creates a new user registration.
-- **Authorization-Header**: Required
-- **Parameters:**
-    - `userId`: string - The unique identifier of the user
-    - `data`: CreateUserRegistrationDto - The data for creating the user registration
-    - `headers`: object - The request headers
+#### Request Headers 
+- authorization : `string`
+
+#### Request body
+- data: `{"generateAuthenticationToken" ?: boolean, "applicationId" : string, "data" ?: string, "registrationId" ?: string}`
+
+#### Request Parameter
+- userId: `string`
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample cURL**:
   ```sh
   curl -X POST http://localhost:3000/registration/<userId> \
@@ -172,14 +233,30 @@ The User Registration Service is part of a NestJS application that handles user 
 
 
 
-### 2. Return A User Registration
-- **Endpoint** : Get `/registration/:userId/:applicationId`
-- **Description** :Retrieves a user registration by user ID and application ID.
-- **Authorization-Header**: Required
-- **Parameters:**
-    - `userId`: string - The unique identifier of the user
-    - `applicationId`: string - The unique identifier of the application
-    - `headers`: object - The request headers
+## Return A User Registration
+### Request 
+#### Retrieves a user registration by user ID and application ID.
+`GET registration/:userId/:applicationId`
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request Parameter
+- userId: `string`
+- applicationID: `string`
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample cURL**:
   ```sh
   curl -X GET http://localhost:3000/registration/<userId>/<applicationId> \
@@ -193,15 +270,33 @@ The User Registration Service is part of a NestJS application that handles user 
 
 
 
-### 3. Update A User Registration
-- **Endpoint** : Patch `/registration/:userId/:applicationId`
-- **Description** : Updates an existing user registration.
-- **Authorization-Header**: Required
-- **Parameters:**
-    - `userId`: string - The unique identifier of the user
-    - `applicationId`: string - The unique identifier of the application
-    - `data`: UpdateUserRegistrationDto - The data to update the user registration
-    - `headers`: object - The request headers
+## Update A User Registration
+### Request 
+#### Updates an existing user registration.
+`PATCH /registration/:userId/:applicationId`
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request Body 
+- data : `{"data" ?: UserRegistrationData, "roles" : string[]}`
+
+#### Request Parameter
+- userId: `string`
+- applicationID: `string`
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample cURL**:
   ```sh
   curl -X PATCH http://localhost:3000/registration/<userId>/<applicationId> \
@@ -222,14 +317,30 @@ The User Registration Service is part of a NestJS application that handles user 
 
 
 
-### 4. Delete A User Registration
-- **Endpoint** : Delete `/registration/:userId/:applicationId`
-- **Description** : Deletes a user registration.
-- **Authorization-Header**: Required
-- **Parameters:**
-    - `usersId`: string - The unique identifier of the user
-    - `applicationsId`: string - The unique identifier of the application
-    - `headers`: object - The request headers
+## Delete A User Registration
+### Request 
+#### Deletes a user registration.
+`DELETE /registration/:userId/:applicationId`
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request Parameter
+- userId: `string`
+- applicationID: `string`
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample cURL**:
   ```sh
   curl -X DELETE http://localhost:3000/registration/<userId>/<applicationId> \
@@ -243,14 +354,32 @@ The User Registration Service is part of a NestJS application that handles user 
 
 
 
-### 5. Create A User And User Registration
-- **Endpoint** : Post `/registration/combined`
-- **Description** : Creates both a user and their registration in a single operation.
-- **Authorization-Header**: Required
-- **Parameters:**
-    - `userId`: string - The unique identifier for the new user
-    - `data`: CreateUserAndUserRegistration - The data for creating both the user and their registration
-    - `headers`: object - The request headers
+## Create A User And User Registration
+### Request 
+#### Creates both a user and their registration in a single operation.
+`POST /registration/combined`
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request Body 
+- data : `CreateUserAndUserRegistration`
+
+#### Request Parameter
+- userId: `string`
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample cURL**:
   ```sh
   curl -X POST http://localhost:3000/registration/combined \

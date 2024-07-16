@@ -8,13 +8,38 @@ Refresh token is a token assigned to user while registration, and is used to ref
 - Comprehensive token retrieval and deletion options
 - Secure token handling and validation
 
-## Endpoints
+## Sequence Diagram
 
-### 1. Refresh Token
-- **Endpoint** : Post `/jwt/refresh`
-- **Description**: Refreshes an access token using a refresh token.
+![Groups Sequence Diagram](../assets/sequence-diagrams/refresh-token.png)
+
+## Refresh Token
+
+### Request
+#### Refreshes an access token using a refresh token.
+`POST /jwt/refresh`
+- **Description**: 
 - **Parameters**: 
   - Refresh token and access token (either through cookie or request body)
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request Parameters
+- Refresh Token : `string`
+- Access Token : `string`
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample HTTPie**:
   ```sh
   http POST http://localhost:3000/jwt/refresh \
@@ -27,10 +52,33 @@ Refresh token is a token assigned to user while registration, and is used to ref
       "refreshToken": "<your_refresh_token>"
     }'
 
-### 2. Retrieve Refresh Token by ID
-- **Endpoint** : Post `/jwt/refresh/:id`
-- **Description**: Retrieves a refresh token by its ID.
-- **Authorization-Header**: Required
+## Retrieve Refresh Token 
+### Request 
+#### Retrieve Refresh Token by ID
+`POST /jwt/refresh/:id`
+
+#### Retrieve Refresh Tokens by User ID
+`POST /jwt/refresh`
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request Parameters
+- `id : string`
+- `userID : string`
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample HTTPie**:
   ```sh
   http POST http://localhost:3000/jwt/refresh/<id> \
@@ -43,34 +91,45 @@ Refresh token is a token assigned to user while registration, and is used to ref
   -H "Content-Type: application/json" \
   -H "Authorization: Basic <your_authorization_key>" \
 
-### 3. Retrieve Refresh Tokens by User ID
-- **Endpoint** : Post `/jwt/refresh`
-- **Description**: Retrieves all refresh tokens for a specific user.
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `userId`: User ID
-- **Sample HTTPie**:
-  ```sh
-  http POST http://localhost:3000/jwt/refresh \
-  Authorization:"Basic <your_authorization_key>" \
-  userId="<user_id>"
+## Delelte Refresh Tokens 
+### Request 
+#### Delete Refresh Tokens by Application ID
+- `POST /jwt/refresh/:tokenId`
 
-- **Sample cURL**:
-  ```sh
-  curl -X POST http://localhost:3000/jwt/refresh \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Basic <your_authorization_key>" \
-  -d '{
-    "userId": "<user_id>"
-  }'
+#### Delete Refresh Tokens by User ID
+- `POST /jwt/refresh`
 
+#### Delete Refresh Tokens by User and Application ID
+- `POST /jwt/refresh`
 
-### 4. Delete Refresh Tokens by Application ID
-- **Endpoint** : Post `/jwt/refresh/:tokenId`
-- **Description**: Deletes all refresh tokens for a specific application.
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `applicationsId`: Application ID
+#### Delete Refresh Token by Token ID
+- `POST /jwt/refresh`
+
+#### Delete Refresh Token by Token String
+- `POST /jwt/refresh`
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request Parameters
+- `applicationsId`: Application ID *required when delete all tokens associated with an application ID*
+- `userId`: User ID *required when delete all tokens associated with a user ID*
+- `userId`: User ID && - `applicationsId`: Application ID *required when delete a tokens associated with a user ID and a application ID*
+- `tokenId`: id *required to delete through a specific refresh token by its ID*
+- `TokenString`: String *required when to delete via specific token string* 
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample HTTPie**:
   ```sh
   http POST http://localhost:3000/jwt/refresh/<tokenId> \
@@ -84,97 +143,6 @@ Refresh token is a token assigned to user while registration, and is used to ref
   -H "Authorization: Basic <your_authorization_key>" \
   -d '{
     "applicationsId": "<application_id>"
-  }'
-
-
-### 5. Delete Refresh Tokens by User ID
-- **Endpoint** : Post `/jwt/refresh`
-- **Description**: Deletes all refresh tokens for a specific user.
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `userId`: User ID
-- **Sample HTTPie**:
-  ```sh
-  http POST http://localhost:3000/jwt/refresh \
-  Authorization:"Basic <your_authorization_key>" \
-  userId="<user_id>"
-
-- **Sample cURL**:
-  ```sh
-  curl -X POST http://localhost:3000/jwt/refresh \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Basic <your_authorization_key>" \
-  -d '{
-    "userId": "<user_id>"
-  }'
-
-
-### 6. Delete Refresh Tokens by User and Application ID
-- **Endpoint** : Post `/jwt/refresh`
-- **Description**: Deletes refresh tokens for a specific user in a specific application.
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `userId`: User ID
-  - `applicationsId`: Application ID
-- **Sample HTTPie**:
-  ```sh
-  http POST http://localhost:3000/jwt/refresh \
-  Authorization:"Basic <your_authorization_key>" \
-  userId="<user_id>" \
-  applicationsId="<application_id>"
-
-- **Sample cURL**:
-  ```sh
-  curl -X POST http://localhost:3000/jwt/refresh \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Basic <your_authorization_key>" \
-  -d '{
-    "userId": "<user_id>",
-    "applicationsId": "<application_id>"
-  }'
-
-
-### 7. Delete Refresh Token by Token ID
-- **Endpoint** : Post `/jwt/refresh`
-- **Description**: Deletes a specific refresh token by its ID.
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `tokenId`: id
-- **Sample HTTPie**:
-  ```sh
-  http POST http://localhost:3000/jwt/refresh \
-  Authorization:"Basic <your_authorization_key>" \
-  tokenId="<token_id>"
-
-- **Sample cURL**:
-  ```sh
-  curl -X POST http://localhost:3000/jwt/refresh \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Basic <your_authorization_key>" \
-  -d '{
-    "tokenId": "<token_id>"
-  }'
-
-
-### 8. Delete Refresh Token by Token String
-- **Endpoint** : Post `/jwt/refresh`
-- **Description**: Deletes a specific refresh token by its token string.
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `TokenString`: String
-- **Sample HTTPie**:
-  ```sh
-  http POST http://localhost:3000/jwt/refresh \
-  Authorization:"Basic <your_authorization_key>" \
-  TokenString="<token_string>"
-
-- **Sample cURL**:
-  ```sh
-  curl -X POST http://localhost:3000/jwt/refresh \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Basic <your_authorization_key>" \
-  -d '{
-    "TokenString": "<token_string>"
   }'
 
 

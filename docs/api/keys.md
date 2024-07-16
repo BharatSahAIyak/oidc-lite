@@ -10,12 +10,36 @@ The service supports generating three types of keys:
 
 Each key type is stored in the database with its relevant information, including public and private keys where applicable.
 
-## Endpoints
+## Sequence Diagram
 
-### 1. Retrieve All Keys
-- **Endpoint** : Get `/key`
-- **Description**: This API is used to retrieve all of the configured Keys.
-- **Authorization-Header**: Required
+![Groups Sequence Diagram](../assets/sequence-diagrams/keys.png)
+
+## Retrieve Keys
+
+### Request
+####  Retrieve All Keys
+`GET /key`
+#### Retrieve Unique Key
+`GET /key/:id`
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request Parameters
+- keyID : `string` *required when returning a key*
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample cURL**:
   ```sh
   curl -X GET http://localhost:3000/key \
@@ -28,32 +52,31 @@ Each key type is stored in the database with its relevant information, including
   Authorization:"Basic <your_authorization_key>"
 
 
+## Update Key
+### Request 
+#### To update an existing key 
+`PUT /key/:id`
 
-### 2. Retrieve Unique Key
-- **Endpoint** : Get `/key/:id`
-- **Description**: This API is used to retrieve a single Key by unique Id or all of the configured Keys.
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `uuid`: The unique id of the key
-- **Sample cURL**:
-  ```sh
-  curl -X GET http://localhost:3000/key/unique_key_id \
-       -H "Authorization: Basic <your_authorization_key>" \
+#### Request Headers 
+- authorization : `string`
 
-- **Sample HTTPie**:
-  ```sh
-  http GET http://localhost:3000/key/unique_key_id \
-  Authorization:"Basic <your_authorization_key>"
+#### Request Parameters
+- `keyID`: The unique id of the key.
+- `name`: The new name for the key.
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
 
 
-### 3. Update Key
-- **Endpoint** : Put `/key/:id`
-- **Description**: This API method is used to update an existing Key.
-Only the name of the Key may be changed; all other fields will remain the same
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `uuid`: The unique id of the key.
-  - `name`: The new name for the key.
 - **Sample cURL**:
   ```sh
   curl -X PUT http://localhost:3000/key/unique_key_id \
@@ -70,12 +93,30 @@ Only the name of the Key may be changed; all other fields will remain the same
   name="new_key_name"
 
 
-### 4. Delete Key
-- **Endpoint** : Delete `/key/:id`
-- **Description**: Deletes a specific key by its UUID.
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `uuid`: The unique id of the key
+## Delete Key
+### Request 
+####  Deletes a specific key by its UUID.
+`DELETE /key/:id`
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request Parameters
+- `keyID`: The unique id of the key.
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
+
 - **Sample cURL**:
   ```sh
   curl -X DELETE http://localhost:3000/key/unique_key_id \
@@ -86,15 +127,36 @@ Only the name of the Key may be changed; all other fields will remain the same
   http DELETE http://localhost:3000/key/unique_key_id \
   Authorization:"Basic <your_authorization_key>"
 
-### 5. Generate Key with random id
-- **Endpoint** : Post `/key/generate`
-- **Description**: Generates a new cryptographic key with specified parameters.
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `uuid`: The unique id for the new key
-  - `algorithm`: The algorithm to use (RS or ES)
-  - `name`: The name of the key
-  - `issuer`: The issuer of the key
+## Generate Key 
+### Request 
+#### Generate Key with random id
+`POST /key/generate`
+#### Generate Key with given id
+`POST /key/generate:id`
+
+#### Request Headers 
+- authorization : `string`
+
+#### Request Parameters
+- `keyID`: The unique id of the key. *required when key generated with given id*
+
+#### Request Body 
+- `algorithm`: The algorithm to use (RS or ES)
+- `name`: The name of the key
+- `issuer`: The issuer of the key
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+
 - **Sample cURL**:
   ```sh
   curl -X POST http://localhost:3000/key/generate \
@@ -112,37 +174,6 @@ Only the name of the Key may be changed; all other fields will remain the same
   http POST http://localhost:3000/key/generate \
   Authorization:"Basic <your_authorization_key>"
   uuid="random_key_id" \
-  algorithm="RS256" \
-  name="new_key" \
-  issuer="example_issuer"
-
-
-### 6. Generate Key with given id
-- **Endpoint** : Post `/key/generate:id`
-- **Description**: Generates a new cryptographic key with specified parameters.
-- **Authorization-Header**: Required
-- **Parameters**: 
-  - `uuid`: The unique id for the new key
-  - `algorithm`: The algorithm to use (RS or ES)
-  - `name`: The name of the key
-  - `issuer`: The issuer of the key
-- **Sample cURL**:
-  ```sh
-  curl -X POST http://localhost:3000/key/generate/unique_key_id \
-  -H "Authorization: Basic <your_authorization_key>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "uuid": "unique_key_id",
-    "algorithm": "RS256",
-    "name": "new_key",
-    "issuer": "example_issuer"
-  }'
-  
-- **Sample HTTPie**:
-  ```sh
-  http POST http://localhost:3000/key/generate/unique_key_id \
-  Authorization:"Basic <your_authorization_key>"
-  uuid="unique_key_id" \
   algorithm="RS256" \
   name="new_key" \
   issuer="example_issuer"

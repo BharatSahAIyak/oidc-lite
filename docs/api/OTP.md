@@ -2,14 +2,35 @@
 
 The OTP (One-Time Password) Service is part of a NestJS application that handles the generation, sending, and validation of one-time passwords. It supports multiple delivery methods including email, SMS, and WhatsApp.
 
-## Endpoints
+## Sequence Diagram
 
-### 1. SendOtp
-- **Endpoint** : Post `/otp/send`
+![Groups Sequence Diagram](../assets/sequence-diagrams/otp.jpeg)
+
+## Send OTP 
+### Request
+#### Generates and sends an OTP via specified channels.
+`POST /otp/send`
 - **Description** : Generates and sends an OTP via specified channels.
 - **Parameters:**
     - `type`: string[] - An array of delivery methods ('mail', 'sms', 'whatsapp')
     - `to`: string - The recipient's address (email, phone number, etc.)
+#### Request Parameters
+- `type`: string[] - An array of delivery methods ('mail', 'sms', 'whatsapp')
+- `to`: string - The recipient's address (email, phone number, etc.)
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+  
+
 - **Sample cURL**:
   ```sh
   curl -X POST http://localhost:3000/otp/send \
@@ -25,11 +46,27 @@ The OTP (One-Time Password) Service is part of a NestJS application that handles
   type:='["mail", "sms"]' \
   to="example@example.com"
 
-### 2. ValidateOtp
-- **Endpoint** : Post `/otp/verify`
-- **Description** : Validates a given OTP.
-- **Parameters:**
+## Validate OTP
+### Request 
+#### Validates a given OTP.
+`POST /otp/verify`
+
+#### Request Parameters
 -   `otp`: string - The OTP to validate
+
+### Response
+
+#### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200  | The request was successful. The response will contain a JSON body. |
+| 400  | The request was invalid and/or malformed. The response will contain an Errors JSON Object with the specific errors. This status will also be returned if a paid Auth Service license is required and is not present. |
+| 401  | You did not supply a valid Authorization header. The header was omitted or your API key was not valid. The response will be empty
+| 404  | The object you are trying to update doesn't exist. The response will be empty. |
+| 500  | There was an internal error. A stack trace is provided and logged in the Auth Service log files. The response will be empty. |
+  
+
 - **Sample cURL**:
   ```sh
   curl -X POST http://localhost:3000/otp/verify \
