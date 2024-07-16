@@ -7,6 +7,7 @@ export class TokenDto {
   @ApiProperty() loginId?: string;
   @ApiProperty() password?: string;
   @ApiProperty() code_verifier?: string;
+  @ApiProperty() refresh_token?: string;
   @ApiProperty() grant_type: string;
   @ApiProperty() redirect_uri: string;
 }

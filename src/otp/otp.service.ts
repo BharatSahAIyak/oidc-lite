@@ -12,7 +12,7 @@ export class OtpService {
   time: number = parseInt(process.env.OTP_TIMEOUT);
 
   async sendOtp(type: string[], to: string) {
-    const otpGenerated = await this.otpManagerService.generateOtp();
+    const otpGenerated = await this.otpManagerService.generateOtp(to);
 
     try {
       if (type.includes('mail')) {
@@ -37,8 +37,8 @@ export class OtpService {
     }
   }
 
-  async validateOtp(otp: string) {
-    const res = await this.otpManagerService.validateOtp(otp);
+  async validateOtp(otp: string, email: string) {
+    const res = await this.otpManagerService.validateOtp(otp, email);
 
     if (res) {
       return {

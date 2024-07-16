@@ -19,7 +19,10 @@ import {
   TokenDto,
 } from './dto/oidc.token.dto';
 import * as jwt from 'jsonwebtoken';
-import { ApplicationDataDto } from '../application/application.dto';
+import {
+  ApplicationDataDto,
+  ApplicationDto,
+} from '../application/application.dto';
 import {
   UserData,
   UserDataDto,
@@ -28,6 +31,7 @@ import {
 } from 'src/user/user.dto';
 import { UtilsService } from '../utils/utils.service';
 import { ResponseDto } from '../dto/response.dto';
+import { OtpService } from '../otp/otp.service';
 
 @Injectable()
 export class OidcService {
@@ -35,6 +39,7 @@ export class OidcService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly utilService: UtilsService,
+    private readonly otpService: OtpService,
   ) {
     this.logger = new Logger(OidcService.name);
   }
@@ -153,6 +158,174 @@ export class OidcService {
       throw new UnauthorizedException({
         success: false,
         message: 'Invalid user credentials',
+      });
+    }
+    try {
+      const alreadyRegisterd =
+        await this.prismaService.userRegistration.findUnique({
+          where: {
+            user_registrations_uk_1: {
+              usersId: user.id,
+              applicationsId: application.id,
+            },
+          },
+        });
+      if (!alreadyRegisterd) {
+        const userRegistration =
+          await this.prismaService.userRegistration.create({
+            data: {
+              applicationsId: application.id,
+              authenticationToken,
+              password: userData.userData.password,
+              usersId: user.id,
+              data: JSON.stringify({
+                code_challenge: code_challenge === '' ? null : code_challenge,
+                code_challenge_method:
+                  code_challenge_method === '' ? null : code_challenge_method,
+                scope,
+              }),
+            },
+          });
+        this.logger.log('A user authenticated', user);
+        return res.redirect(
+          `${redirect_uri}?code=${userRegistration.authenticationToken}&state=${state}`,
+        );
+      }
+      const updateRegistration =
+        await this.prismaService.userRegistration.update({
+          where: { id: alreadyRegisterd.id },
+          data: {
+            authenticationToken,
+            data: JSON.stringify({
+              code_challenge: code_challenge === '' ? null : code_challenge,
+              code_challenge_method:
+                code_challenge_method === '' ? null : code_challenge_method,
+              scope,
+            }),
+          },
+        });
+
+      this.logger.log('A user authenticated', user);
+      res.redirect(
+        `${redirect_uri}?code=${updateRegistration.authenticationToken}&state=${state}`,
+      );
+    } catch (error) {
+      this.logger.log('Error from postAuthorize', error);
+      throw new InternalServerErrorException({
+        success: false,
+        message: 'Error occured while registering',
+      });
+    }
+  }
+
+  async passwordless_otp(
+    req: Request,
+    res: Response,
+    query: OIDCAuthQuery,
+    headers: object,
+  ) {
+    const {
+      client_id,
+      tenantId,
+      redirect_uri,
+      response_type,
+      scope,
+      state,
+      code_challenge,
+      code_challenge_method,
+    } = query;
+    if (!client_id) {
+      throw new BadRequestException({
+        success: false,
+        message: 'No client/application id given',
+      });
+    }
+    if (!redirect_uri) {
+      throw new BadRequestException({
+        success: false,
+        message: 'No redirect uri given',
+      });
+    }
+    if (!scope) {
+      throw new BadRequestException({
+        success: false,
+        message: 'Scopes not given',
+      });
+    }
+    if (!response_type) {
+      throw new BadRequestException({
+        success: false,
+        message: 'No response type given',
+      });
+    }
+    res.render('passwordless-otp', {
+      host: `${process.env.FULL_URL}`,
+      applicationId: client_id,
+      redirect_uri,
+      state,
+      scope,
+      response_type,
+      code_challenge,
+      code_challenge_method,
+    });
+  }
+
+  async postPasswordless_otp(
+    data: LoginDto & { otp: string },
+    query: OIDCAuthQuery,
+    headers: object,
+    res: Response,
+  ) {
+    if (!data || !data.loginId) {
+      throw new BadRequestException({
+        success: false,
+        message: 'No data given',
+      });
+    }
+    const {
+      loginId,
+      state,
+      scope,
+      code_challenge,
+      code_challenge_method,
+      redirect_uri,
+    } = data;
+    const { client_id } = query;
+    const application = await this.prismaService.application.findUnique({
+      where: { id: client_id },
+    });
+    if (!application) {
+      throw new BadRequestException({
+        success: false,
+        message: 'No such application exists',
+      });
+    }
+    const applicationData: ApplicationDataDto = JSON.parse(application.data);
+    const redirectUrls =
+      applicationData.oauthConfiguration.authorizedRedirectURLs;
+    if (!redirectUrls.includes(redirect_uri)) {
+      throw new UnauthorizedException({
+        success: false,
+        message:
+          'The given redirect_uri doesnt match with the registered redirect uris',
+      });
+    }
+    const user = await this.prismaService.user.findUnique({
+      where: { email: loginId },
+    });
+    if (!user) {
+      throw new BadRequestException({
+        success: false,
+        message: 'No such user exists',
+      });
+    }
+    const authenticationToken = randomUUID();
+    const userData: UserData = JSON.parse(user.data);
+    const valid = await this.otpService.validateOtp(data.otp, loginId);
+    if (!valid.success) {
+      throw new UnauthorizedException({
+        success: valid.success,
+        message: valid.message,
       });
     }
     try {
@@ -385,7 +558,8 @@ export class OidcService {
         message: 'No data given',
       });
     }
-    const { code, grant_type, redirect_uri, loginId, password } = data;
+    const { code, grant_type, redirect_uri, loginId, password, refresh_token } =
+      data;
     if (!code || !grant_type || !redirect_uri) {
       throw new BadRequestException({
         success: false,
@@ -544,6 +718,21 @@ export class OidcService {
         success: false,
         message: 'you reached a part of server that is not yet implemented',
       });
+    } else if (grant_type === 'refresh_token') {
+      if (
+        !applicationData.oauthConfiguration.enabledGrants.includes(
+          'refresh_token',
+        )
+      ) {
+        throw new BadRequestException({
+          success: false,
+          message: 'refresh_token grant type not supported by your application',
+        });
+      }
+      return await this.returnAccessTokenForRefreshToken(
+        application,
+        refresh_token,
+      );
     }
     const scopes: string[] | null = scope?.split(' ');
     const validScopes =
@@ -652,6 +841,85 @@ export class OidcService {
       refreshTokenId: offline_accessAllowed ? newRefreshToken.id : null,
       userId: user.id,
       token_type: 'Bearer',
+    };
+  }
+
+  private async returnAccessTokenForRefreshToken(
+    application: ApplicationDto,
+    refresh_token: string,
+  ) {
+    const applicationData: ApplicationDataDto = JSON.parse(application.data);
+    const accessTokenSigningKeyId =
+      applicationData.jwtConfiguration.accessTokenSigningKeysID;
+    const accessTokenSigningKey = await this.prismaService.key.findUnique({
+      where: { id: accessTokenSigningKeyId },
+    });
+    const refreshToken = await this.utilService.checkValidityOfToken(
+      refresh_token,
+      accessTokenSigningKey.publicKey,
+      'refresh',
+    );
+    if (refreshToken.active === false) {
+      return {
+        active: false,
+      };
+    }
+    const userId = (refreshToken as jwt.JwtPayload).sub; // sub has userid
+    const userRegistration =
+      await this.prismaService.userRegistration.findUnique({
+        where: {
+          user_registrations_uk_1: {
+            applicationsId: application.id,
+            usersId: userId,
+          },
+        },
+      });
+    if (!userRegistration) {
+      return {
+        active: false,
+      };
+    }
+    const userRegistrationData: UserRegistrationData = JSON.parse(
+      userRegistration.data,
+    );
+    const now = Math.floor(Date.now() / 1000);
+    const accessTokenSeconds =
+      applicationData.jwtConfiguration.timeToLiveInSeconds;
+    const rolesIds =
+      await this.utilService.returnRolesForAGivenUserIdAndApplicationId(
+        userId,
+        application.id,
+      );
+    const roles = await Promise.all(
+      rolesIds.map(async (roleId) => {
+        const role = await this.prismaService.applicationRole.findUnique({
+          where: { id: roleId },
+        });
+        return role.name;
+      }),
+    );
+    const accessTokenPayload: AccessTokenDto = {
+      active: true,
+      roles,
+      iat: now,
+      exp: now + accessTokenSeconds,
+      iss: process.env.ISSUER_URL,
+      sub: userId,
+      aud: application.id,
+      applicationId: application.id,
+      scope: userRegistrationData.scope,
+    };
+    const accessToken = await this.utilService.createToken(
+      accessTokenPayload,
+      application.id,
+      application.tenantId,
+      'access',
+    );
+    return {
+      refresh_token,
+      access_token: accessToken,
+      token_type: 'Bearer',
+      expires_in: now + accessTokenSeconds,
     };
   }
 

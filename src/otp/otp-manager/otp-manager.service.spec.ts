@@ -21,40 +21,43 @@ describe('OtpManagerService', () => {
   });
 
   it('should generate a 6-digit OTP by default', async () => {
-    const otp = await service.generateOtp();
+    const otp = await service.generateOtp('some mail');
     expect(otp).toHaveLength(6);
     expect(Number(otp)).toBeGreaterThanOrEqual(100000);
     expect(Number(otp)).toBeLessThanOrEqual(999999);
   });
 
   it('should store the OTP with expiration time', async () => {
-    const otp = await service.generateOtp();
-    const expirationTime = service['otpStore'].get(otp);
-    expect(expirationTime).toBeDefined();
-    expect(expirationTime).toBeGreaterThan(Date.now());
+    const otp = await service.generateOtp('some mail');
+    const data = service['otpStore'].get(otp);
+    expect(data).toBeDefined();
+    expect(data.expirationTime).toBeGreaterThan(Date.now());
   });
 
   it('should validate a valid OTP', async () => {
-    const otp = await service.generateOtp();
-    const isValid = await service.validateOtp(otp);
+    const otp = await service.generateOtp('some mail');
+    const isValid = await service.validateOtp(otp, 'some mail');
     expect(isValid).toBe(true);
   });
 
   it('should not validate an invalid OTP', async () => {
-    const isValid = await service.validateOtp('000000');
+    const isValid = await service.validateOtp('000000', 'some mail');
     expect(isValid).toBe(false);
   });
 
   it('should invalidate an OTP after use', async () => {
-    const otp = await service.generateOtp();
-    await service.validateOtp(otp);
-    const isValid = await service.validateOtp(otp);
+    const otp = await service.generateOtp('some mail');
+    await service.validateOtp(otp, 'some mail');
+    const isValid = await service.validateOtp(otp, 'some mail');
     expect(isValid).toBe(false);
   });
 
   it('should clean expired OTPs', async () => {
-    const otp = await service.generateOtp();
-    service['otpStore'].set(otp, Date.now() - 1000); // Set OTP as expired
+    const otp = await service.generateOtp('some mail');
+    service['otpStore'].set(otp, {
+      email: 'some mail',
+      expirationTime: Date.now() - 1000,
+    }); // Set OTP as expired
     await service.cleanExpiredOtps();
     const expirationTime = service['otpStore'].get(otp);
     expect(expirationTime).toBeUndefined();

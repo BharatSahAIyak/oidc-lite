@@ -117,7 +117,11 @@
               "http://localhost:4180/oauth2/callback"
             ],
             "clientSecret": "#{clientSecret}",
-            "enabledGrants": ["authorization_code", "password"],
+            "enabledGrants": [
+              "authorization_code",
+              "password",
+              "refresh_token"
+            ],
             "logoutURL": "http://localhost:3000/logout"
           }
         }
@@ -158,8 +162,7 @@
           },
           "registrationInfo": {
             "generateAuthenticationToken": true,
-            "applicationId": "#{applicationId}",
-            "roles": ["user"]
+            "applicationId": "#{applicationId}"
           }
         }
       }

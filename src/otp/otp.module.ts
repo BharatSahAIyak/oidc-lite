@@ -7,5 +7,6 @@ import { OtpManagerService } from './otp-manager/otp-manager.service';
 @Module({
   controllers: [OtpController],
   providers: [OtpService, OtpAdaptersService, OtpManagerService],
+  exports: [OtpService]
 })
 export class OtpModule {}

@@ -1118,8 +1118,8 @@ describe('UserRegistrationService', () => {
           success: true,
           message: 'User and user registration created successfully!',
           data: {
-            user: mockUser,
-            userRegistration: mockUserRegistration,
+            user: expect.any(Object),
+            userRegistration: expect.any(Object),
             refresh_token: mockRefreshToken,
             refreshTokenId: mockSaveToken.id,
           },

@@ -2,18 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { OidcService } from './oidc.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { UtilsService } from '../utils/utils.service';
-import {
-  BadRequestException,
-  UnauthorizedException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { OIDCAuthQuery } from './dto/oidc.auth.dto';
 import { LoginDto } from '../login/login.dto';
 import * as jwt from 'jsonwebtoken';
-import { access } from 'fs';
-import { create } from 'domain';
-import { log } from 'console';
+import { OtpModule } from '../otp/otp.module';
 
 describe('OidcService', () => {
   let service: OidcService;
@@ -22,6 +16,7 @@ describe('OidcService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [OtpModule],
       providers: [
         OidcService,
         {

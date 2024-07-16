@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { OidcModule } from './oidc/oidc.module';
@@ -18,6 +23,7 @@ import { OtpModule } from './otp/otp.module';
 import { TenantModule } from './tenant/tenant.module';
 import { ApiKeysModule } from './api-keys/api-keys.module';
 import { UtilsService } from './utils/utils.service';
+import { AdminMiddleware } from './middlewares/admin.middleware';
 
 @Module({
   imports: [
@@ -43,4 +49,12 @@ import { UtilsService } from './utils/utils.service';
   controllers: [AppController],
   providers: [AppService, PrismaService, MemoryMonitorService, UtilsService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AdminMiddleware)
+      .exclude({ path: 'admin', method: RequestMethod.POST })
+      .exclude({ path: 'health', method: RequestMethod.GET })
+      .forRoutes('*');
+  }
+}

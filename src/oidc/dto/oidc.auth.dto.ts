@@ -1,12 +1,36 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsString } from 'class-validator';
 
 export class OIDCAuthQuery {
-  @ApiProperty() client_id: string;
-  @ApiProperty() redirect_uri: string;
-  @ApiProperty() response_type: string;
-  @ApiProperty() tenantId: string;
-  @ApiProperty() scope: string;
-  @ApiProperty() state: string;
-  @ApiProperty() code_challenge: string;
-  @ApiProperty() code_challenge_method: string;
+  @IsString()
+  @ApiProperty()
+  client_id: string;
+
+  @IsString()
+  @ApiProperty()
+  redirect_uri: string;
+
+  @IsString()
+  @ApiProperty()
+  response_type: string;
+
+  @IsString()
+  @ApiProperty()
+  tenantId: string;
+
+  @IsString()
+  @ApiProperty()
+  scope: string;
+
+  @IsString()
+  @ApiProperty()
+  state: string;
+
+  @IsString()
+  @ApiProperty()
+  code_challenge: string;
+
+  @IsString()
+  @ApiProperty()
+  code_challenge_method: string;
 }

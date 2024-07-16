@@ -30,6 +30,6 @@ export class OtpController {
   })
   @ApiResponse({ status: 400, description: 'Invalid OTP.' })
   async verifyOtp(@Body() body: VerifyOtpDto): Promise<OtpResponseDto> {
-    return await this.otpService.validateOtp(body.otp);
+    return await this.otpService.validateOtp(body.otp,body.email);
   }
 }

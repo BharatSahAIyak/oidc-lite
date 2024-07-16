@@ -53,6 +53,7 @@ describe('OtpController', () => {
     it('should call otpService.validateOtp and return the result', async () => {
       const verifyOtpDto: VerifyOtpDto = {
         otp: '123456',
+        email: 'some mail',
       };
       const otpResponseDto: OtpResponseDto = {
         success: true,
@@ -64,7 +65,10 @@ describe('OtpController', () => {
       const result = await controller.verifyOtp(verifyOtpDto);
 
       expect(result).toEqual(otpResponseDto);
-      expect(otpService.validateOtp).toHaveBeenCalledWith(verifyOtpDto.otp);
+      expect(otpService.validateOtp).toHaveBeenCalledWith(
+        verifyOtpDto.otp,
+        verifyOtpDto.email,
+      );
     });
   });
 });

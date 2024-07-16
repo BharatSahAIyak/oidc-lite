@@ -100,9 +100,9 @@ describe('OtpService', () => {
     it('should validate the OTP and return success if valid', async () => {
       jest.spyOn(otpManagerService, 'validateOtp').mockResolvedValue(true);
 
-      const result = await otpService.validateOtp('123456');
+      const result = await otpService.validateOtp('123456', 'some mail');
 
-      expect(otpManagerService.validateOtp).toHaveBeenCalledWith('123456');
+      expect(otpManagerService.validateOtp).toHaveBeenCalledWith('123456','some mail');
       expect(result).toEqual({
         success: true,
         message: 'OTP is valid and verified',
@@ -112,9 +112,9 @@ describe('OtpService', () => {
     it('should return failure if the OTP is invalid or expired', async () => {
       jest.spyOn(otpManagerService, 'validateOtp').mockResolvedValue(false);
 
-      const result = await otpService.validateOtp('123456');
+      const result = await otpService.validateOtp('123456', 'some mail');
 
-      expect(otpManagerService.validateOtp).toHaveBeenCalledWith('123456');
+      expect(otpManagerService.validateOtp).toHaveBeenCalledWith('123456','some mail');
       expect(result).toEqual({
         success: false,
         message: 'OTP is invalid or expired',

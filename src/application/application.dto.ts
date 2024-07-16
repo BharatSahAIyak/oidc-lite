@@ -418,3 +418,15 @@ export class ApplicationDataDto {
   @Type(() => JwtConfiguration)
   jwtConfiguration: JwtConfiguration;
 }
+
+export class ApplicationDto {
+  @ApiProperty() id: string;
+  @ApiProperty() accessTokenSigningKeysId: string;
+  @ApiProperty() active: boolean;
+  @ApiProperty() data: string;
+  @ApiProperty() idTokenSigningKeysId: string;
+  @ApiProperty() createdAt: Date;
+  @ApiProperty() updatedAt: Date;
+  @ApiProperty() name: string;
+  @ApiProperty() tenantId: string;
+}

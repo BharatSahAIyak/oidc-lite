@@ -15,6 +15,9 @@ export class VerifyOtpDto {
   @IsString()
   @Length(6, 6)
   otp: string;
+
+  @ApiProperty()
+  email: string;
 }
 
 export class OtpResponseDto {

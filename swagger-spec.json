@@ -408,6 +408,173 @@
         ]
       }
     },
+    "/oidc/passwordless-otp": {
+      "get": {
+        "operationId": "OidcController_passwordless_otp",
+        "parameters": [
+          {
+            "name": "client_id",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "redirect_uri",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "response_type",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tenantId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "scope",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code_challenge",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code_challenge_method",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "OIDC"
+        ]
+      },
+      "post": {
+        "operationId": "OidcController_postPasswordless_otp",
+        "summary": "Post registration",
+        "parameters": [
+          {
+            "name": "client_id",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "redirect_uri",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "response_type",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tenantId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "scope",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code_challenge",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code_challenge_method",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "OIDC"
+        ]
+      }
+    },
     "/oidc/token": {
       "post": {
         "operationId": "OidcController_returnToken",
@@ -562,6 +729,74 @@
         },
         "tags": [
           "OIDC"
+        ]
+      }
+    },
+    "/otp/send": {
+      "post": {
+        "operationId": "OtpController_sendOtp",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OtpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "OTP sent successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OtpResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input."
+          }
+        },
+        "tags": [
+          "OTP"
+        ]
+      }
+    },
+    "/otp/verify": {
+      "post": {
+        "operationId": "OtpController_verifyOtp",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOtpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP verified successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OtpResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid OTP."
+          }
+        },
+        "tags": [
+          "OTP"
         ]
       }
     },
@@ -2568,74 +2803,6 @@
         ]
       }
     },
-    "/otp/send": {
-      "post": {
-        "operationId": "OtpController_sendOtp",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OtpDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "OTP sent successfully.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OtpResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input."
-          }
-        },
-        "tags": [
-          "OTP"
-        ]
-      }
-    },
-    "/otp/verify": {
-      "post": {
-        "operationId": "OtpController_verifyOtp",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerifyOtpDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OTP verified successfully.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OtpResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid OTP."
-          }
-        },
-        "tags": [
-          "OTP"
-        ]
-      }
-    },
     "/tenant": {
       "post": {
         "operationId": "TenantController_createATenantWithRandomUUID",
@@ -3294,6 +3461,9 @@
           "code_verifier": {
             "type": "string"
           },
+          "refresh_token": {
+            "type": "string"
+          },
           "grant_type": {
             "type": "string"
           },
@@ -3308,6 +3478,7 @@
           "loginId",
           "password",
           "code_verifier",
+          "refresh_token",
           "grant_type",
           "redirect_uri"
         ]
@@ -3329,6 +3500,50 @@
           "client_id",
           "client_secret",
           "token"
+        ]
+      },
+      "OtpDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "to": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "to"
+        ]
+      },
+      "OtpResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ]
+      },
+      "VerifyOtpDto": {
+        "type": "object",
+        "properties": {
+          "otp": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "otp"
         ]
       },
       "UserDataDto": {
@@ -3871,50 +4086,6 @@
         },
         "required": [
           "members"
-        ]
-      },
-      "OtpDto": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "to": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "type",
-          "to"
-        ]
-      },
-      "OtpResponseDto": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "success",
-          "message"
-        ]
-      },
-      "VerifyOtpDto": {
-        "type": "object",
-        "properties": {
-          "otp": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "otp"
         ]
       },
       "CreateTenantDto": {
